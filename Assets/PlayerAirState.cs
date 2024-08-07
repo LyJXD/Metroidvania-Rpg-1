@@ -16,15 +16,30 @@ public class PlayerAirState : PlayerState
     public override void Exit()
     {
         base.Exit();
+
+        player.SetVelocity(0, rb.velocity.y);
     }
 
     public override void Update()
     {
         base.Update();
 
+        if (player.IsWallDetected() && rb.velocity.y < 0)
+        {
+            stateMachine.ChangeState(player.wallSlide);
+        }
+
         if (player.IsGroundDetected())
         {
             stateMachine.ChangeState(player.idleState);
+        }
+
+        /*
+         * ¿ÕÖÐÒÆ¶¯
+         */
+        if (xInput != 0)
+        {
+            player.SetVelocity(player.moveSpeed * .8f * xInput, rb.velocity.y);
         }
     }
 }

@@ -8,6 +8,13 @@ public class Player : MonoBehaviour
     public float moveSpeed = 8f;
     public float jumpForce;
 
+    [Header("Dash info")]
+    [SerializeField] private float dashCoolDown;
+    private float dashUsageTimer;
+    public float dashSpeed;
+    public float dashDuration;
+    public float dashDir { get; private set; }
+
     [Header("Collision info")]
     [SerializeField] private Transform groundCheck;
     [SerializeField] private float groundCheckDistance;
@@ -30,6 +37,8 @@ public class Player : MonoBehaviour
     public PlayerMoveState moveState { get; private set; }
     public PlayerJumpState jumpState { get; private set; }
     public PlayerAirState airState { get; private set; }
+    public PlayerDashState dashState { get; private set; }
+    public PlayerWallSlideState wallSlide { get; private set; }
     #endregion
 
     private void Awake()
@@ -40,6 +49,8 @@ public class Player : MonoBehaviour
         moveState = new PlayerMoveState(this, stateMachine, "Move");
         jumpState = new PlayerJumpState(this, stateMachine, "Jump");
         airState = new PlayerAirState(this, stateMachine, "Jump");
+        dashState = new PlayerDashState(this, stateMachine, "Dash");
+        wallSlide = new PlayerWallSlideState(this, stateMachine, "WallSlide");
     }
 
     private void Start()
@@ -52,16 +63,47 @@ public class Player : MonoBehaviour
 
     private void Update()
     {
-        stateMachine.currentState.Update();    
+        stateMachine.currentState.Update();
+
+        CheckForDashInput();
     }
 
+
+    private void CheckForDashInput()
+    {
+        dashUsageTimer -= Time.deltaTime; // 距用户上次使用冲刺时间
+
+        /*
+         * LeftShift冲刺
+         */
+        if (Input.GetKeyDown(KeyCode.LeftShift) && dashUsageTimer < 0)
+        {
+            dashUsageTimer = dashCoolDown; // 重置为设定冷却时间
+
+            dashDir = Input.GetAxisRaw("Horizontal");
+
+            if (dashDir == 0)
+            {
+                dashDir = facingDir;
+            }
+
+            stateMachine.ChangeState(dashState);
+        }
+    }
+    /*
+     * 速度设置 
+     */
     public void SetVelocity(float _xVelocity, float _yVelocity)
     {
         rb.velocity = new Vector2(_xVelocity, _yVelocity);
         FlipController(_xVelocity);
     }
 
+    /*
+     * 碰撞检测
+     */
     public bool IsGroundDetected() => Physics2D.Raycast(groundCheck.position, Vector2.down, groundCheckDistance, whatIsGround);
+    public bool IsWallDetected() => Physics2D.Raycast(wallCheck.position, Vector2.right * facingDir, wallCheckDistance, whatIsGround); 
 
     private void OnDrawGizmos()
     {
@@ -69,6 +111,9 @@ public class Player : MonoBehaviour
         Gizmos.DrawLine(wallCheck.position, new Vector3(wallCheck.position.x + wallCheckDistance, wallCheck.position.y));
     }
 
+    /*
+     * 翻转 
+     */
     public void Flip()
     {
         facingDir = facingDir * -1;

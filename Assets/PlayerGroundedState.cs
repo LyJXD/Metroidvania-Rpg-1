@@ -11,6 +11,7 @@ public class PlayerGroundedState : PlayerState
     public override void Enter()
     {
         base.Enter();
+
     }
 
     public override void Exit()
@@ -22,7 +23,15 @@ public class PlayerGroundedState : PlayerState
     {
         base.Update();
 
-        if(Input.GetKeyDown(KeyCode.Space) && player.IsGroundDetected())
+        if(!player.IsGroundDetected())
+        {
+            stateMachine.ChangeState(player.airState);
+        }
+
+        /*
+         * ¿Õ¸ñÌøÔ¾
+         */
+        if (Input.GetKeyDown(KeyCode.Space) && player.IsGroundDetected())
         {
             stateMachine.ChangeState(player.jumpState);
         }
