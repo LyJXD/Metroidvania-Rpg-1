@@ -22,24 +22,32 @@ public class Player : MonoBehaviour
     [SerializeField] private float wallCheckDistance;
     [SerializeField] private LayerMask whatIsGround;
 
+
     public int facingDir { get; private set; } = 1;
     private bool facingRight = true;
+
 
     #region Components
     public Animator anim { get; private set; }
     public Rigidbody2D rb { get; private set; }
     #endregion
 
-    #region States
-    public PlayerStateMachine stateMachine { get; private set; }
 
+    #region States  
+    public PlayerStateMachine stateMachine { get; private set; }    // ×´Ì¬»ú 
+    /*
+     * ÉùÃ÷Íæ¼Ò×´Ì¬
+     */
     public PlayerIdleState idleState { get; private set; }
     public PlayerMoveState moveState { get; private set; }
     public PlayerJumpState jumpState { get; private set; }
     public PlayerAirState airState { get; private set; }
     public PlayerDashState dashState { get; private set; }
     public PlayerWallSlideState wallSlide { get; private set; }
+    public PlayerWallJumpState wallJump { get; private set; }
+    public PlayerPrimaryAttack primaryAttack { get; private set; }
     #endregion
+
 
     private void Awake()
     {
@@ -51,6 +59,8 @@ public class Player : MonoBehaviour
         airState = new PlayerAirState(this, stateMachine, "Jump");
         dashState = new PlayerDashState(this, stateMachine, "Dash");
         wallSlide = new PlayerWallSlideState(this, stateMachine, "WallSlide");
+        wallJump = new PlayerWallJumpState(this, stateMachine, "Jump");
+        primaryAttack = new PlayerPrimaryAttack(this, stateMachine, "Attack");
     }
 
     private void Start()
@@ -68,6 +78,8 @@ public class Player : MonoBehaviour
         CheckForDashInput();
     }
 
+
+    public void AnimationTrigger() => stateMachine.currentState.AnimationFinishTrigger();
 
     private void CheckForDashInput()
     {
@@ -87,9 +99,16 @@ public class Player : MonoBehaviour
                 dashDir = facingDir;
             }
 
+            if (stateMachine.currentState == wallSlide)
+            {
+                dashDir = -facingDir;
+            }
+
+
             stateMachine.ChangeState(dashState);
         }
     }
+
     /*
      * ËÙ¶ÈÉèÖÃ 
      */
@@ -103,7 +122,7 @@ public class Player : MonoBehaviour
      * Åö×²¼ì²â
      */
     public bool IsGroundDetected() => Physics2D.Raycast(groundCheck.position, Vector2.down, groundCheckDistance, whatIsGround);
-    public bool IsWallDetected() => Physics2D.Raycast(wallCheck.position, Vector2.right * facingDir, wallCheckDistance, whatIsGround); 
+    public bool IsWallDetected() => Physics2D.Raycast(wallCheck.position, Vector2.right * facingDir, wallCheckDistance, whatIsGround);
 
     private void OnDrawGizmos()
     {

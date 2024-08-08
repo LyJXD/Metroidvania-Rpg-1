@@ -13,14 +13,15 @@ public class PlayerDashState : PlayerState
     {
         base.Enter();
 
+        /*
+         * Éè¶¨×´Ì¬Ê±¼ä-³å´Ì
+         */
         stateTimer = player.dashDuration;
     }
 
     public override void Exit()
     {
         base.Exit();
-
-        player.SetVelocity(0,rb.velocity.y);
     }
 
     public override void Update()
@@ -28,6 +29,15 @@ public class PlayerDashState : PlayerState
         base.Update();
 
         player.SetVelocity(player.dashSpeed * player.dashDir, 0);
+
+
+        /*
+         * Åö×²¼ì²â
+         */
+        if(!player.IsGroundDetected() && player.IsWallDetected())
+        {
+            stateMachine.ChangeState(player.wallSlide);
+        }
 
         if (stateTimer < 0)
         {

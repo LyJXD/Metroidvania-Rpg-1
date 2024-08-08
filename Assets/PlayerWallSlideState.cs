@@ -21,7 +21,18 @@ public class PlayerWallSlideState : PlayerState
     public override void Update()
     {
         base.Update();
-        
+
+        /*
+         * µÅÇ½Ìø
+         */
+        if (Input.GetKeyDown(KeyCode.Space)){
+            stateMachine.ChangeState(player.wallJump);
+            return;
+        }
+
+        /*
+         * Àë¿ªÇ½Ãæ
+         */
         if (xInput != 0 && player.facingDir != xInput)
         {
             stateMachine.ChangeState(player.idleState);
@@ -36,6 +47,9 @@ public class PlayerWallSlideState : PlayerState
             rb.velocity = new Vector2(0, rb.velocity.y * .7f);
         }
 
+        /*
+         * Åö×²¼ì²â-µØÃæ
+         */
         if (player.IsGroundDetected())
         {
             stateMachine.ChangeState(player.idleState);

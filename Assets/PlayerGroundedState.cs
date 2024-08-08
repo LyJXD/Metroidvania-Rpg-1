@@ -11,7 +11,6 @@ public class PlayerGroundedState : PlayerState
     public override void Enter()
     {
         base.Enter();
-
     }
 
     public override void Exit()
@@ -22,6 +21,14 @@ public class PlayerGroundedState : PlayerState
     public override void Update()
     {
         base.Update();
+
+        /*
+         * Êó±ê×ó¼üÆÕÍ¨¹¥»÷
+         */
+        if (Input.GetKeyDown(KeyCode.Mouse0))
+        {
+            stateMachine.ChangeState(player.primaryAttack);
+        }
 
         if(!player.IsGroundDetected())
         {

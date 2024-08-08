@@ -13,7 +13,8 @@ public class PlayerState
     protected float yInput;
     private string animBoolName;
 
-    protected float stateTimer; // 状态持续时间
+    protected float stateTimer;     // 状态持续时间
+    protected bool triggerCalled;   // 触发器
 
     public PlayerState(Player _player, PlayerStateMachine _stateMachine, string _animBoolName)
     {
@@ -26,6 +27,7 @@ public class PlayerState
     {
         player.anim.SetBool(animBoolName, true);
         rb = player.rb;
+        triggerCalled = false;
     }
 
     public virtual void Update()
@@ -40,5 +42,10 @@ public class PlayerState
     public virtual void Exit()
     {
         player.anim.SetBool(animBoolName, false);
+    }
+
+    public virtual void AnimationFinishTrigger()
+    {
+        triggerCalled = true;
     }
 }
