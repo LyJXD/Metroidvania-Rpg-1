@@ -4,6 +4,10 @@ using UnityEngine;
 
 public class Player : MonoBehaviour
 {
+    [Header("Attack Details")]
+    public Vector2[] attackMovement;
+
+    public bool isBusy { get; private set; }
     [Header("Move info")]
     public float moveSpeed = 8f;
     public float jumpForce;
@@ -45,7 +49,7 @@ public class Player : MonoBehaviour
     public PlayerDashState dashState { get; private set; }
     public PlayerWallSlideState wallSlide { get; private set; }
     public PlayerWallJumpState wallJump { get; private set; }
-    public PlayerPrimaryAttack primaryAttack { get; private set; }
+    public PlayerPrimaryAttackState primaryAttack { get; private set; }
     #endregion
 
 
@@ -60,7 +64,7 @@ public class Player : MonoBehaviour
         dashState = new PlayerDashState(this, stateMachine, "Dash");
         wallSlide = new PlayerWallSlideState(this, stateMachine, "WallSlide");
         wallJump = new PlayerWallJumpState(this, stateMachine, "Jump");
-        primaryAttack = new PlayerPrimaryAttack(this, stateMachine, "Attack");
+        primaryAttack = new PlayerPrimaryAttackState(this, stateMachine, "Attack");
     }
 
     private void Start()
@@ -76,6 +80,19 @@ public class Player : MonoBehaviour
         stateMachine.currentState.Update();
 
         CheckForDashInput();
+    }
+
+    /*
+     * 协程
+     * 等待_seconds后执行后续代码
+     */ 
+    public IEnumerable BusyFor(float _seconds)
+    {
+        isBusy = true;
+
+        yield return new WaitForSeconds(_seconds);
+
+        isBusy = false;
     }
 
 
@@ -109,6 +126,7 @@ public class Player : MonoBehaviour
         }
     }
 
+    #region Velocity
     /*
      * 速度设置 
      */
@@ -117,7 +135,10 @@ public class Player : MonoBehaviour
         rb.velocity = new Vector2(_xVelocity, _yVelocity);
         FlipController(_xVelocity);
     }
+    public void ZeroVelocity() => rb.velocity = new Vector2(0, 0);
+    #endregion
 
+    #region Collision
     /*
      * 碰撞检测
      */
@@ -129,7 +150,9 @@ public class Player : MonoBehaviour
         Gizmos.DrawLine(groundCheck.position, new Vector3(groundCheck.position.x, groundCheck.position.y - groundCheckDistance));
         Gizmos.DrawLine(wallCheck.position, new Vector3(wallCheck.position.x + wallCheckDistance, wallCheck.position.y));
     }
+    #endregion
 
+    #region Flip
     /*
      * 翻转 
      */
@@ -151,4 +174,5 @@ public class Player : MonoBehaviour
             Flip();
         }
     }
+    #endregion
 }

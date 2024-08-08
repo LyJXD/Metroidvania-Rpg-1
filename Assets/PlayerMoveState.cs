@@ -25,10 +25,10 @@ public class PlayerMoveState : PlayerGroundedState
         /*
          * 若此时处于其他状态则return
          */
-        if (stateMachine.currentState != this)
+        /*if (stateMachine.currentState != this)
         {
             return;
-        }
+        }*/
 
         player.SetVelocity(xInput * player.moveSpeed, rb.velocity.y);
 
