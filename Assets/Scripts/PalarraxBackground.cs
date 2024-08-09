@@ -9,18 +9,30 @@ public class PalarraxBackground : MonoBehaviour // 视差背景
     [SerializeField] private float parallaxEffect;
 
     private float xPosition;
+    private float length;
 
     void Start()
     {
         cam = GameObject.Find("Main Camera");
 
+        length = GetComponent<SpriteRenderer>().bounds.size.x;
         xPosition = transform.position.x;
     }
 
     void Update()
     {
-        float distanceToMove = cam.transform.position.x * parallaxEffect;
+        float distanceMoved = cam.transform.position.x * (1 - parallaxEffect);  // 相机中心点与背景中心点的距离
+        float distanceToMove = cam.transform.position.x * parallaxEffect;       // 背景移动距离
 
         transform.position = new Vector3(xPosition + distanceToMove, transform.position.y);
+
+        if(distanceMoved > xPosition + length)
+        {
+            xPosition += length;
+        }
+        else if(distanceMoved < xPosition - length)
+        {
+            xPosition -= length;
+        }
     }
 }
