@@ -42,5 +42,13 @@ public class PlayerGroundedState : PlayerState
         {
             stateMachine.ChangeState(player.jumpState);
         }
+
+        /*
+         * Q¼ü·´»÷
+         */
+        if(Input.GetKeyDown(KeyCode.Q)) 
+        {
+            stateMachine.ChangeState(player.counterAttack);
+        }
     }
 }

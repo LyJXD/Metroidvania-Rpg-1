@@ -13,7 +13,7 @@ public class PalarraxBackground : MonoBehaviour //  ”≤Ó±≥æ∞
 
     void Start()
     {
-        cam = GameObject.Find("Main Camera");
+        cam =  GameObject.Find("Main Camera");
 
         length = GetComponent<SpriteRenderer>().bounds.size.x;
         xPosition = transform.position.x;
