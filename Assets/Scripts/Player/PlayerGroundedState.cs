@@ -30,7 +30,15 @@ public class PlayerGroundedState : PlayerState
             stateMachine.ChangeState(player.primaryAttack);
         }
 
-        if(!player.IsGroundDetected())
+        /*
+         * 鼠标右键投剑瞄准
+         */
+        if (Input.GetKeyDown(KeyCode.Mouse1) && HasNoSwordOutside())
+        {
+            stateMachine.ChangeState(player.aimSword);
+        }
+
+        if (!player.IsGroundDetected())
         {
             stateMachine.ChangeState(player.airState);
         }
@@ -46,9 +54,31 @@ public class PlayerGroundedState : PlayerState
         /*
          * Q键反击
          */
-        if(Input.GetKeyDown(KeyCode.Q)) 
+        if (Input.GetKeyDown(KeyCode.Q))
         {
             stateMachine.ChangeState(player.counterAttack);
         }
+
+        /*
+         * R键黑洞技能
+         */
+        if(Input.GetKeyDown(KeyCode.R))
+        {
+            stateMachine.ChangeState(player.blackHole);
+        }
+    }
+
+    /*
+     * 判断剑是否为被扔出状态
+     */
+    private bool HasNoSwordOutside()
+    {
+        if (!player.sword)
+        {
+            return true;
+        }
+
+        player.sword.GetComponent<Sword_Skill_Controller>().ReturnSword();
+        return false;
     }
 }

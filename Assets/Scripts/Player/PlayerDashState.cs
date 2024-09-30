@@ -13,6 +13,8 @@ public class PlayerDashState : PlayerState
     {
         base.Enter();
 
+        player.skill.clone.CreateClone(player.transform, Vector3.zero);
+
         /*
          * 设定状态时间-冲刺
          */

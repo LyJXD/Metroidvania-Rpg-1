@@ -12,11 +12,15 @@ public class Player : Entity
     [Header("Move info")]
     public float moveSpeed = 8f;
     public float jumpForce;
+    public float swordReturnImpact;     // 回收剑的后坐力
 
     [Header("Dash info")]
     public float dashSpeed;
     public float dashDuration;
     public float dashDir { get; private set; }
+
+    public SkillManager skill { get; private set; }
+    public GameObject sword { get; private set; }
 
     #region States  
     public PlayerStateMachine stateMachine { get; private set; }    // 状态机 
@@ -32,6 +36,9 @@ public class Player : Entity
     public PlayerWallJumpState wallJump { get; private set; }
     public PlayerPrimaryAttackState primaryAttack { get; private set; }
     public PlayerCounterAttackState counterAttack { get; private set; }
+    public PlayerAimSwordState aimSword { get; private set; }
+    public PlayerCatachSwordState catchSword { get; private set; }
+    public PlayerBlackholeState blackHole { get; private set; }
     #endregion
 
     protected override void Awake()
@@ -47,13 +54,21 @@ public class Player : Entity
         dashState = new PlayerDashState(this, stateMachine, "Dash");
         wallSlide = new PlayerWallSlideState(this, stateMachine, "WallSlide");
         wallJump = new PlayerWallJumpState(this, stateMachine, "Jump");
+
         primaryAttack = new PlayerPrimaryAttackState(this, stateMachine, "Attack");
         counterAttack = new PlayerCounterAttackState(this, stateMachine, "CounterAttack");
+
+        aimSword = new PlayerAimSwordState(this, stateMachine, "AimSword");
+        catchSword = new PlayerCatachSwordState(this, stateMachine, "CatchSword");
+        blackHole = new PlayerBlackholeState(this, stateMachine, "Jump");
+
     }
 
     protected override void Start()
     {
         base.Start();
+
+        skill = SkillManager.instance;
 
         stateMachine.Initialize(idleState);
     }
@@ -87,7 +102,7 @@ public class Player : Entity
         /*
          * LeftShift冲刺
          */
-        if (Input.GetKeyDown(KeyCode.LeftShift) && SkillManager.instance.dash.CanUseSkill())
+        if (Input.GetKeyDown(KeyCode.LeftShift) && skill.dash.CanUseSkill())
         {
             dashDir = Input.GetAxisRaw("Horizontal");
 
@@ -104,5 +119,16 @@ public class Player : Entity
 
             stateMachine.ChangeState(dashState);
         }
+    }
+
+    public void AssignNewSword(GameObject _newSword)
+    {
+        sword = _newSword;
+    }
+    
+    public void CatchTheSword()
+    {
+        stateMachine.ChangeState(catchSword);
+        Destroy(sword);
     }
 }
